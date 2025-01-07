@@ -2,10 +2,13 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Footer, Navbar } from "../components";
+import '../components/Login.css'
 
 const Login = ({ setIsAuthenticated }) => {
-  const navigate = useNavigate(); // for navigation after login
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -14,87 +17,95 @@ const Login = ({ setIsAuthenticated }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
+
     try {
-      // Make the POST request to login
       const response = await axios.post("http://localhost:9091/login/", formData);
+
       if (response.data) {
-        console.log(response.data);
-        
-        // After successful login, make a GET request to fetch user details by email
         const userResponse = await axios.get(`http://localhost:9091/user/get/${formData.email}`);
-        
         if (userResponse.data) {
-          // Store the entire user object in localStorage
-          localStorage.setItem("user", JSON.stringify(userResponse.data)); // Store the user data in localStorage
-          
-          alert("Login Successful!");
-
-          // Update authentication state
+          localStorage.setItem("user", JSON.stringify(userResponse.data));
+          setSuccessMessage("Login Successful!");
           setIsAuthenticated(true);
-
-          // Redirect to the profile page (or any other page you want)
-          navigate("/");
+          setTimeout(() => navigate("/"), 1500);
         } else {
-          alert("User data not found.");
+          setErrorMessage("User data not found.");
         }
       } else {
-        alert("Invalid email or password.");
+        setErrorMessage("Invalid email or password.");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("Something went wrong. Please try again.");
+      setErrorMessage("Something went wrong. Please try again.");
     }
   };
 
   return (
     <>
-      {/* <Navbar /> */}
-      <div className="container my-3 py-3">
-        <h1 className="text-center">Login</h1>
-        <hr />
-        <div className="row my-4 h-100">
-          <div className="col-md-4 col-lg-4 col-sm-8 mx-auto">
-            <form onSubmit={handleSubmit}>
-              <div className="my-3">
-                <label htmlFor="email">Email Address</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  id="email"
-                  name="email"
-                  placeholder="name@example.com"
-                  onChange={handleInputChange}
-                  value={formData.email}
-                />
-              </div>
-              <div className="my-3">
-                <label htmlFor="password">Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  id="password"
-                  name="password"
-                  placeholder="Password"
-                  onChange={handleInputChange}
-                  value={formData.password}
-                />
-              </div>
-              <div className="my-3">
-                <p>
-                  New Here?{" "}
-                  <Link to="/register" className="text-decoration-underline text-info">
-                    Register
-                  </Link>
-                  <p>Forgot password?<Link to="/forgetpassword" className="text-decoration-underline text-info">ForgetPassword</Link></p>
-                </p>
-              </div>
-              <div className="text-center">
-                <button className="my-2 mx-auto btn btn-dark" type="submit">
-                  Login
-                </button>
-              </div>
-            </form>
-          </div>
+      <div className="login-container">
+        <div className="login-card">
+          <h1 className="login-title">Welcome Back!</h1>
+          <p className="login-subtitle">Log in to access your account</p>
+          <hr className="divider" />
+
+          {errorMessage && (
+            <div className="alert alert-danger custom-alert" role="alert">
+              {errorMessage}
+            </div>
+          )}
+          {successMessage && (
+            <div className="alert alert-success custom-alert" role="alert">
+              {successMessage}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="login-form">
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">
+                Email Address
+              </label>
+              <input
+                type="email"
+                className="form-control custom-input"
+                id="email"
+                name="email"
+                placeholder="name@example.com"
+                onChange={handleInputChange}
+                value={formData.email}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
+              <input
+                type="password"
+                className="form-control custom-input"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                onChange={handleInputChange}
+                value={formData.password}
+                required
+              />
+            </div>
+            <div className="login-links">
+              <Link to="/register" className="custom-link">
+                New here? Register
+              </Link>
+              <Link to="/forgetpassword" className="custom-link">
+                Forgot Password?
+              </Link>
+            </div>
+            <div className="text-center">
+              <button type="submit" className="btn custom-btn">
+                Login
+              </button>
+            </div>
+          </form>
         </div>
       </div>
       <Footer />

@@ -12,22 +12,20 @@ const Register = () => {
         status: 'accepted',
         email: '',
         dob: '',
-        role: '', // Initially empty, will be populated by the user selection
+        role: '',
     });
-    const [roles, setRoles] = useState([]); // State to hold roles fetched from the backend
+    const [roles, setRoles] = useState([]);
 
     useEffect(() => {
-        // Fetch roles from the backend
         const fetchRoles = async () => {
             try {
                 const response = await axios.get('http://localhost:9091/role/get');
-                setRoles(response.data); // Assuming the response is an array of roles
+                setRoles(response.data);
             } catch (error) {
                 console.error('Error fetching roles:', error);
                 alert('Failed to fetch roles');
             }
         };
-
         fetchRoles();
     }, []);
 
@@ -48,36 +46,22 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('set ==>',roles);
-        
 
-        // Build role array based on the selected role
-        let roleArray =[];
-            if(formData.role === 'Seller'){
-               roleArray =  roles.filter(el =>{
-                 return   el.name == "Seller" || el.name == "Buyer"
-                })
-             }
-             else{ 
-                roleArray =  roles.filter(el =>{
-                    return   el.name == "Buyer"
-                   })
-            }
-            console.log(roleArray);
-            
+        let roleArray = [];
+        if (formData.role === 'Seller') {
+            roleArray = roles.filter((el) => el.name === "Seller" || el.name === "Buyer");
+        } else {
+            roleArray = roles.filter((el) => el.name === "Buyer");
+        }
 
-        // Final payload to send    
         const payload = {
             ...formData,
             role: roleArray,
         };
 
         try {
-            console.log(payload);
             const response = await axios.post('http://localhost:9091/user/add', payload);
             console.log('Sign up successful:', response.data);
-
-            // Reset form data after successful submission
             setFormData({
                 firstName: '',
                 lastName: '',
@@ -97,14 +81,12 @@ const Register = () => {
 
     return (
         <>
-            {/* <Navbar /> */}
-            <div className="container my-3 py-3">
-                <h1 className="text-center">Register</h1>
-                <hr />
-                <div className="row my-4 h-100">
-                    <div className="col-md-4 col-lg-4 col-sm-8 mx-auto">
-                        <form onSubmit={handleSubmit}>
-                            <div className="form my-3">
+            <div className="container my-5 py-5">
+                <h1 className="text-center text-dark mb-4">Create Your Account</h1>
+                <div className="row justify-content-center">
+                    <div className="col-md-6 col-lg-5 col-sm-8">
+                        <form onSubmit={handleSubmit} className="p-4 shadow-lg rounded bg-light">
+                            <div className="form-group my-3">
                                 <label htmlFor="firstName">First Name</label>
                                 <input
                                     type="text"
@@ -117,7 +99,7 @@ const Register = () => {
                                     required
                                 />
                             </div>
-                            <div className="form my-3">
+                            <div className="form-group my-3">
                                 <label htmlFor="lastName">Last Name</label>
                                 <input
                                     type="text"
@@ -130,7 +112,7 @@ const Register = () => {
                                     required
                                 />
                             </div>
-                            <div className="form my-3">
+                            <div className="form-group my-3">
                                 <label htmlFor="contact_no">Contact Number</label>
                                 <input
                                     type="tel"
@@ -143,7 +125,7 @@ const Register = () => {
                                     required
                                 />
                             </div>
-                            <div className="form my-3">
+                            <div className="form-group my-3">
                                 <label htmlFor="dob">Date of Birth</label>
                                 <input
                                     type="date"
@@ -155,7 +137,7 @@ const Register = () => {
                                     required
                                 />
                             </div>
-                            <div className="form my-3">
+                            <div className="form-group my-3">
                                 <label htmlFor="email">Email Address</label>
                                 <input
                                     type="email"
@@ -168,7 +150,7 @@ const Register = () => {
                                     required
                                 />
                             </div>
-                            <div className="form my-3">
+                            <div className="form-group my-3">
                                 <label htmlFor="password">Password</label>
                                 <input
                                     type="password"
@@ -181,7 +163,7 @@ const Register = () => {
                                     required
                                 />
                             </div>
-                            <div className="form my-3">
+                            <div className="form-group my-3">
                                 <label htmlFor="role">Role</label>
                                 <select
                                     className="form-control"
@@ -191,9 +173,7 @@ const Register = () => {
                                     onChange={handleRoleChange}
                                     required
                                 >
-                                    <option value="" disabled>
-                                        Select a Role
-                                    </option>
+                                    <option value="" disabled>Select a Role</option>
                                     {roles.map((role, index) => (
                                         <option key={index} value={role.name}>
                                             {role.name}
@@ -201,16 +181,13 @@ const Register = () => {
                                     ))}
                                 </select>
                             </div>
-                            <div className="my-3">
+                            <div className="my-3 text-center">
                                 <p>
-                                    Already have an account?{' '}
-                                    <Link to="/login" className="text-decoration-underline text-info">
-                                        Login
-                                    </Link>
+                                    Already have an account? <Link to="/login" className="text-decoration-underline text-info">Login</Link>
                                 </p>
                             </div>
                             <div className="text-center">
-                                <button className="my-2 mx-auto btn btn-dark" type="submit">
+                                <button className="btn btn-primary btn-lg px-4 py-2" type="submit">
                                     Register
                                 </button>
                             </div>

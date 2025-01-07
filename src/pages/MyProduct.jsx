@@ -17,7 +17,9 @@ const MyProduct = () => {
       if (userId) {
         try {
           // Fetch products for the user by userId
-          const response = await axios.get(`http://localhost:9091/product/get/user/${userId}`);
+          const response = await axios.get(
+            `http://localhost:9091/product/get/user/${userId}`
+          );
           setProducts(response.data);
           console.log(response.data);
           setLoading(false);
@@ -54,8 +56,14 @@ const MyProduct = () => {
           <div key={product.id} className="col-md-3 col-sm-6 mb-4">
             <div className="card h-100 text-center">
               <img
-                src={`data:image/png;base64,${product.productImages[0].image}`}
-                alt={product.name}
+                src={
+                  product &&
+                  product.productImages &&
+                  product.productImages.length > 0
+                    ? `data:image/png;base64,${product.productImages[0].image}`
+                    : "https://via.placeholder.com/200" // fallback image
+                }
+                alt={product?.name || "Product"} // fallback alt text
                 className="card-img-top p-3"
                 height="200"
               />

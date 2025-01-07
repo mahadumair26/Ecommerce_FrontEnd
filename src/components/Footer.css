@@ -1,0 +1,59 @@
+/* Footer container styling */
+.simple-footer {
+    background-color: #ffffff; /* Plain white background */
+    color: #333; /* Dark gray text */
+    padding: 20px 0;
+    text-align: center;
+    border-top: 1px solid #eaeaea; /* Subtle top border for separation */
+    margin-top: auto;
+    font-family: "Arial", sans-serif;
+  }
+  
+  /* Footer text styling */
+  .footer-text {
+    font-size: 1rem;
+    margin: 0;
+    font-weight: 400;
+  }
+  
+  .footer-text .heart {
+    color: #ff4d67; /* Bright red for the heart */
+  }
+  
+  /* Footer link styling */
+  .footer-link {
+    color: #007bff; /* Subtle blue link color */
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .footer-link:hover {
+    color: #0056b3; /* Darker blue on hover */
+    text-decoration: underline;
+  }
+  
+  /* Footer icon styling */
+  .footer-icon-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: #333; /* Dark gray for the icon */
+    font-size: 1.5rem;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .footer-icon-link:hover {
+    color: #007bff; /* Blue on hover for the icon */
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .footer-text {
+      font-size: 0.9rem;
+    }
+  
+    .footer-icon-link {
+      font-size: 1.2rem;
+    }
+  }
+  

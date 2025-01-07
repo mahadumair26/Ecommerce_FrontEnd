@@ -1,0 +1,81 @@
+/* General Navbar Styling */
+.custom-navbar {
+    background-color: #ffffff; /* Clean white background */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 1rem;
+  }
+  
+  /* Brand Heading - Floats Left */
+  .navbar-brand {
+    color: #333;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    float: left;
+    margin-right: 1rem;
+  }
+  
+  /* Navbar Links */
+  .nav-link {
+    color: #555;
+    font-size: 1rem;
+    margin: 0 0.5rem;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  .nav-link:hover {
+    color: #007bff;
+  }
+  
+  /* Navbar Buttons Floated Right */
+  .navbar-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    float: right;
+  }
+  
+  /* Button Styles */
+  .btn {
+    border-radius: 20px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  /* Button Color Variants */
+  .btn-outline-primary:hover {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .btn-outline-success:hover {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .btn-outline-info:hover {
+    background-color: #17a2b8;
+    color: white;
+  }
+  
+  .btn-outline-dark:hover {
+    background-color: #333;
+    color: white;
+  }
+  
+  /* Mobile Adjustments */
+  @media (max-width: 768px) {
+    .navbar-buttons {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+  

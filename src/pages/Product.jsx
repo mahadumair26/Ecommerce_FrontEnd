@@ -19,8 +19,8 @@ const Product = () => {
       try {
         const response = await axios.get(`http://localhost:9091/product/get/${id}`);
         setProduct(response.data);
-        console.log(product);
-        
+console.log(product);
+
         setFormData(response.data); // Initialize form with product data
         setLoading(false);
       } catch (error) {
@@ -41,7 +41,7 @@ const Product = () => {
         await axios.delete(`http://localhost:9091/product/delete/${id}`);
         alert("Product deleted successfully.");
         // Redirect user after deletion
-        window.location.href = "/my-products";
+        window.location.href = "/my-product";
       } catch (error) {
         console.error("Error deleting product:", error);
         alert("Failed to delete product.");
@@ -119,10 +119,18 @@ const Product = () => {
                   onChange={handleInputChange}
                 ></textarea>
               </div>
-              <button type="button" className="btn btn-success me-2" onClick={handleSave}>
+              <button
+                type="button"
+                className="btn btn-success me-2"
+                onClick={handleSave}
+              >
                 Save Changes
               </button>
-              <button type="button" className="btn btn-secondary" onClick={handleEditToggle}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleEditToggle}
+              >
                 Cancel
               </button>
             </form>
@@ -134,17 +142,21 @@ const Product = () => {
             <img
               className="img-fluid"
               src={
-                product.productImages && product.productImages.length > 0
+                product?.productImages &&
+                product?.productImages.length > 0 &&
+                product.productImages[0].image
                   ? `data:image/png;base64,${product.productImages[0].image}`
-                  : "https://via.placeholder.com/400" // Placeholder image
+                  : "https://via.placeholder.com/400"
               }
-              alt={product.name || "Product"}
+              alt={product?.name || "Product"}
               width="400px"
               height="400px"
             />
           </div>
           <div className="col-md-6 col-sm-12 py-5">
-            <h4 className="text-uppercase text-muted">Category ID: {product.category_id}</h4>
+            <h4 className="text-uppercase text-muted">
+              Category ID: {product.category_id}
+            </h4>
             <h1 className="display-5">{product.name}</h1>
             <h3 className="display-6 my-4">${product.price}</h3>
             <p className="lead">{product.description}</p>
@@ -160,12 +172,11 @@ const Product = () => {
 
             {product.user_id === userId && (
               <div className="mt-4">
-                <button className="btn btn-primary me-2" onClick={handleEditToggle}>
-                  Edit Product
-                </button>
-                <button className="btn btn-danger" onClick={handleDelete}>
-                  Delete Product
-                </button>
+                {product?.showDeleteProductButton && (
+                  <button className="btn btn-danger" onClick={handleDelete}>
+                    Delete Product
+                  </button>
+                )}
               </div>
             )}
           </div>

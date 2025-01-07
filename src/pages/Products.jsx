@@ -18,15 +18,15 @@ const Products = () => {
       });
   }, []);
 
+
   return (
     <>
-      {/* <Navbar /> */}
       <SearchBar
         setSearchResults={setSearchResults}
         categories={categories}
         setSelectedCategory={setSelectedCategory}
       />
-      <Product products={searchResults} /> {/* Pass search results to Product */}
+      <Product products={searchResults} />
       <Footer />
     </>
   );
