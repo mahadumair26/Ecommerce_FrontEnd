@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Footer, Navbar } from "../components";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -9,9 +8,10 @@ import { useDispatch } from "react-redux";
 
 const Checkout = () => {
   const state = useSelector((state) => state.handleCart);
-  let cartProducts = JSON.parse(localStorage.getItem("cart")) || []; 
+  let cartProducts = JSON.parse(localStorage.getItem("cart")) || [];
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false); // State for tracking loading
 
   const EmptyCart = () => {
     return (
@@ -29,7 +29,6 @@ const Checkout = () => {
   };
 
   const ShowCardItems = () => {
-    
     return (
       <div>
         <h6 className="d-flex justify-content-between align-items-center gap-3">
@@ -58,36 +57,23 @@ const Checkout = () => {
       return total + item?.qty * item?.price;
     }, 0);
   };
-  
-  
 
   const ShowCheckout = () => {
-    let subtotal = 0;
-    let shipping = 30.0;
-    let totalItems = 0;
-    let user =  JSON.parse(localStorage.getItem("user"));
-   
+    let user = JSON.parse(localStorage.getItem("user"));
+
     const [paymentMethod, setPaymentMethod] = useState("");
 
-    state.map((item) => {
-      return (subtotal += item.price * item.qty);
-    });
-
-    state.map((item) => {
-      return (totalItems += item.qty);
-    });
-
     const [formData, setFormData] = useState({
-      address: user?.location?.address ||  "",
+      address: user?.location?.address || "",
       city: user?.location?.city || "",
-      country: user?.location?.country || ""
+      country: user?.location?.country || "",
     });
-  
+
     const handleChange = (event) => {
       const { name, value } = event.target;
       setFormData({
         ...formData,
-        [name]: value, 
+        [name]: value,
       });
     };
 
@@ -97,97 +83,105 @@ const Checkout = () => {
 
     const handleSubmit = async (e) => {
       e.preventDefault();
+      setLoading(true); // Set loading to true when submission starts
 
-      try{
+      try {
+        const isLocationDetailsChanged = () => {
+          return (
+            user?.location?.city !== formData.city ||
+            user?.location?.country !== formData.country ||
+            user?.location?.address !== formData.address
+          );
+        };
 
-        const isLocationDetailsChanged = () =>{
-          return user?.location?.city != formData.city || 
-                 user?.location?.country != formData.country ||
-                 user?.location?.address != formData.address;
-        }
-
-        if(isLocationDetailsChanged()){
-
+        if (isLocationDetailsChanged()) {
           const updateLocation = {
             id: user?.location?.id,
-            city:formData.city,
-            country:formData.country,
-            address:formData.address
-          }
-          
-          const locationResponse = await axios.patch(`http://localhost:9091/location/update/${user?.id}`, updateLocation, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+            city: formData.city,
+            country: formData.country,
+            address: formData.address,
+          };
 
-          if(locationResponse.data){
+          const locationResponse = await axios.patch(
+            `http://localhost:9091/location/update/${user?.id}`,
+            updateLocation,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (locationResponse.data) {
             user.location = locationResponse.data;
           }
-    
-          localStorage.setItem('user',JSON.stringify(user))
-          console.log("User location updated !..")
-          
+
+          localStorage.setItem("user", JSON.stringify(user));
+          console.log("User location updated!...");
         }
 
         const paymentDetails = {
-          amount:calculateTotalAmount(),
-          paymentMethod:paymentMethod,
-        }
+          amount: calculateTotalAmount(),
+          paymentMethod: paymentMethod,
+        };
 
-        const paymentResponse = await axios.post('http://localhost:9091/payment/add',paymentDetails,{
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-
-        if(paymentResponse.data){
-
-          const cartItems = cartProducts.map(item=>({
-            productId:item?.id,
-            quantity:item?.qty,
-            price:item?.qty*item?.price
-          }))
-
-          const orderDetails = {
-            totalAmount: calculateTotalAmount(),
-            paymentId:paymentResponse.data.id,
-            userId:user.id,
-            items:cartItems
-          }
-
-          const orderResponse = await axios.post('http://localhost:9091/order/add',orderDetails,{
+        const paymentResponse = await axios.post(
+          "http://localhost:9091/payment/add",
+          paymentDetails,
+          {
             headers: {
               "Content-Type": "application/json",
             },
-          })
-
-          // After order remove the save products from the cart
-
-          if(orderResponse.data){
-            localStorage.removeItem("cart")
-            dispatch({ type: "CLEARCART" });
-
-
-            const handleConfirmOrder = () => {
-              navigate("/order-confirmed", { state: orderResponse.data });
-            };
-
-            handleConfirmOrder();
           }
+        );
 
+        if (paymentResponse.data) {
+          const cartItems = cartProducts.map((item) => ({
+            productId: item?.id,
+            quantity: item?.qty,
+            price: item?.qty * item?.price,
+          }));
+
+          const orderDetails = {
+            totalAmount: calculateTotalAmount(),
+            paymentId: paymentResponse.data.id,
+            userId: user.id,
+            items: cartItems,
+          };
+
+          const orderResponse = await axios.post(
+            "http://localhost:9091/order/add",
+            orderDetails,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (orderResponse.data) {
+            localStorage.removeItem("cart");
+            dispatch({ type: "CLEARCART" });
+            navigate("/order-confirmed", { state: orderResponse.data });
+          }
         }
-
-      }catch(error){
-        console.error(error)
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false); // Set loading to false when submission finishes
       }
-      
-
     };
 
     return (
       <>
         <div className="container py-5">
+          {loading && ( // Display loading spinner when loading
+            <div className="d-flex justify-content-center mb-3">
+              <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          )}
           <div className="row my-4">
             <div className="col-md-5 col-lg-4 order-md-last">
               <div className="card mb-4">
@@ -219,10 +213,10 @@ const Checkout = () => {
                   <h4 className="mb-0">Billing address</h4>
                 </div>
                 <div className="card-body">
-                  <form className="needs-validation" novalidate>
+                  <form className="needs-validation" noValidate>
                     <div className="row g-3">
                       <div className="col-sm-6 my-1">
-                        <label for="firstName" className="form-label">
+                        <label htmlFor="firstName" className="form-label">
                           First name
                         </label>
                         <input
@@ -235,7 +229,7 @@ const Checkout = () => {
                       </div>
 
                       <div className="col-sm-6 my-1">
-                        <label for="lastName" className="form-label">
+                        <label htmlFor="lastName" className="form-label">
                           Last name
                         </label>
                         <input
@@ -245,11 +239,10 @@ const Checkout = () => {
                           value={user.lastName}
                           disabled
                         />
-                      
                       </div>
 
                       <div className="col-12 my-1">
-                        <label for="email" className="form-label">
+                        <label htmlFor="email" className="form-label">
                           Email
                         </label>
                         <input
@@ -259,11 +252,10 @@ const Checkout = () => {
                           value={user.email}
                           disabled
                         />
-                      
                       </div>
 
                       <div className="col-12 my-1">
-                        <label for="address" className="form-label">
+                        <label htmlFor="address" className="form-label">
                           Address
                         </label>
                         <input
@@ -275,11 +267,10 @@ const Checkout = () => {
                           value={formData.address}
                           onChange={handleChange}
                         />
-                        
                       </div>
 
                       <div className="col-md-5 my-1">
-                        <label for="country" className="form-label">
+                        <label htmlFor="country" className="form-label">
                           Country
                         </label>
                         <br />
@@ -298,7 +289,7 @@ const Checkout = () => {
                       </div>
 
                       <div className="col-md-4 my-1">
-                        <label for="state" className="form-label">
+                        <label htmlFor="state" className="form-label">
                           City
                         </label>
                         <br />
@@ -315,7 +306,6 @@ const Checkout = () => {
                           Please provide a valid city.
                         </div>
                       </div>
-
                     </div>
 
                     <hr className="my-4" />
@@ -324,7 +314,6 @@ const Checkout = () => {
 
                     <div className="row gy-3">
                       <div className="row gy-3">
-                      
                         <div className="col-12">
                           <label>
                             <input
@@ -347,33 +336,33 @@ const Checkout = () => {
                               checked={paymentMethod === "Cash"}
                               onChange={handlePaymentChange}
                             />
-                           <span> Payment by Cash</span>
+                            <span> Payment by Cash</span>
                           </label>
                         </div>
                       </div>
                     </div>
 
-                    
+                    {paymentMethod === "Card" && (
+                      <div className="row gy-3">
+                        <hr></hr>
+                        <h4>Card Details</h4>
+                        <div className="col-md-6">
+                          <label htmlFor="cc-name" className="form-label">
+                            Name on card
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="cc-name"
+                            placeholder=""
+                            required
+                          />
+                          <small className="text-muted">
+                            Full name as displayed on card
+                          </small>
+                          <div className="invalid-feedback">
+                            Name on card is required
 
-                    {paymentMethod === "Card" && (<div className="row gy-3">
-                      <hr></hr>
-                      <h4>Card Details</h4>
-                      <div className="col-md-6">
-                        <label for="cc-name" className="form-label">
-                          Name on card
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="cc-name"
-                          placeholder=""
-                          required
-                        />
-                        <small className="text-muted">
-                          Full name as displayed on card
-                        </small>
-                        <div className="invalid-feedback">
-                          Name on card is required
                         </div>
                       </div>
 

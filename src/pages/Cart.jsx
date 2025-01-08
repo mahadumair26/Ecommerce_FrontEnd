@@ -57,7 +57,10 @@ const Cart = () => {
                         <div key={item.id}>
                           <div className="row d-flex align-items-center">
                             <div className="col-lg-3 col-md-12">
-                              <div
+                              {console.log(item)}
+                              {/* {console.log(item.productImages[0].image)} */}
+                              
+                              {/* <div
                                 className="bg-image rounded"
                                 data-mdb-ripple-color="light"
                               >
@@ -68,7 +71,18 @@ const Cart = () => {
                                   width={100}
                                   height={75}
                                 />
-                              </div>
+                              </div> */}
+                              <div className="bg-image rounded" data-mdb-ripple-color="light">
+                                      <img
+                                        src={
+                                          item?.productImages?.[0]?.image
+                                            ? `data:image/png;base64,${item.productImages[0].image}`
+                                            : "https://via.placeholder.com/200" 
+                                        }
+                                        alt={item?.title || "Product"} 
+                                        style={{ width: 100, height: 75 }} 
+                                      />
+                                    </div>
                             </div>
 
                             <div className="col-lg-5 col-md-6">
