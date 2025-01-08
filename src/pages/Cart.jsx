@@ -1,12 +1,20 @@
-import React from "react";
 import { Footer, Navbar } from "../components";
 import { useSelector, useDispatch } from "react-redux";
 import { addCart, delCart } from "../redux/action";
 import { Link } from "react-router-dom";
+import React, { useState, useEffect} from "react";
 
 const Cart = () => {
   const state = useSelector((state) => state.handleCart);
   const dispatch = useDispatch();
+  const [isUserLogin, setLoginUser] = useState(false);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      setLoginUser(true);
+    }
+  }, []); 
 
   const EmptyCart = () => {
     return (
@@ -59,7 +67,7 @@ const Cart = () => {
                             <div className="col-lg-3 col-md-12">
                               {console.log(item)}
                               {/* {console.log(item.productImages[0].image)} */}
-                              
+
                               {/* <div
                                 className="bg-image rounded"
                                 data-mdb-ripple-color="light"
@@ -72,22 +80,25 @@ const Cart = () => {
                                   height={75}
                                 />
                               </div> */}
-                              <div className="bg-image rounded" data-mdb-ripple-color="light">
-                                      <img
-                                        src={
-                                          item?.productImages?.[0]?.image
-                                            ? `data:image/png;base64,${item.productImages[0].image}`
-                                            : "https://via.placeholder.com/200" 
-                                        }
-                                        alt={item?.title || "Product"} 
-                                        style={{ width: 100, height: 75 }} 
-                                      />
-                                    </div>
+                              <div
+                                className="bg-image rounded"
+                                data-mdb-ripple-color="light"
+                              >
+                                <img
+                                  src={
+                                    item?.productImages?.[0]?.image
+                                      ? `data:image/png;base64,${item.productImages[0].image}`
+                                      : "https://via.placeholder.com/200"
+                                  }
+                                  alt={item?.title || "Product"}
+                                  style={{ width: 100, height: 75 }}
+                                />
+                              </div>
                             </div>
 
                             <div className="col-lg-5 col-md-6">
                               <p>
-                                <strong>{item.title}</strong>
+                                <strong>{item.name}</strong>
                               </p>
                               {/* <p>Color: blue</p>
                               <p>Size: M</p> */}
@@ -143,7 +154,8 @@ const Cart = () => {
                   <div className="card-body">
                     <ul className="list-group list-group-flush">
                       <li className="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
-                        Products ({totalItems})<span>${Math.round(subtotal)}</span>
+                        Products ({totalItems})
+                        <span>${Math.round(subtotal)}</span>
                       </li>
                       <li className="list-group-item d-flex justify-content-between align-items-center px-0">
                         Shipping
@@ -159,12 +171,21 @@ const Cart = () => {
                       </li>
                     </ul>
 
-                    <Link
-                      to="/checkout"
-                      className="btn btn-dark btn-lg btn-block"
-                    >
-                      Go to checkout
-                    </Link>
+                    {isUserLogin ? (
+                      <Link
+                        to="/checkout"
+                        className="btn btn-dark btn-lg btn-block"
+                      >
+                        Go to checkout
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/login"
+                        className="btn btn-dark btn-lg btn-block"
+                      >
+                        Login to Continue
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
